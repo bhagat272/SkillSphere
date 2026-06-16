@@ -3,7 +3,7 @@ import { setCredentials, logout } from './authSlice';
 
 // Base Query with authentication headers
 const baseQuery = fetchBaseQuery({
-  baseUrl: '/api/v1',
+  baseUrl: import.meta.env.VITE_API_URL ?? '/api/v1',
   credentials: 'include',
   prepareHeaders: (headers, { getState }) => {
     const token = (getState() as any).auth.accessToken;
