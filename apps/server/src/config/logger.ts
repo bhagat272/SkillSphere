@@ -8,6 +8,7 @@ import { env } from './env';
 //   - JSON format in production for tools like Datadog, CloudWatch, Papertrail
 
 const { combine, timestamp, printf, colorize, errors, json } = winston.format;
+const isServerless = process.env.VERCEL === '1';
 
 // Custom dev format
 const devFormat = printf(({ level, message, timestamp, stack, ...meta }) => {
@@ -29,8 +30,9 @@ export const logger = winston.createLogger({
           ? combine(timestamp(), json())
           : combine(colorize({ all: true }), timestamp({ format: 'HH:mm:ss' }), devFormat),
     }),
-    // File transports (production only)
-    ...(env.NODE_ENV === 'production'
+    // File transports for traditional production servers only.
+    // Vercel functions have a read-only filesystem except /tmp, so console logs are used there.
+    ...(env.NODE_ENV === 'production' && !isServerless
       ? [
           new winston.transports.File({
             filename: 'logs/error.log',
