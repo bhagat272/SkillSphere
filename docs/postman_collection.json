@@ -1,0 +1,102 @@
+{
+  "info": {
+    "name": "SkillSphere AI",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api/v1" },
+    { "key": "accessToken", "value": "" },
+    { "key": "jobId", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Auth - Register",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"demo@skillsphere.ai\",\"password\":\"Password123!\",\"firstName\":\"Demo\",\"lastName\":\"User\",\"role\":\"user\"}"
+        }
+      }
+    },
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"demo@skillsphere.ai\",\"password\":\"Password123!\"}"
+        }
+      }
+    },
+    {
+      "name": "Auth - Me",
+      "request": { "method": "GET", "url": "{{baseUrl}}/auth/me" }
+    },
+    {
+      "name": "Posts - Feed",
+      "request": { "method": "GET", "url": "{{baseUrl}}/posts?page=1&limit=10" }
+    },
+    {
+      "name": "Posts - Create",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/posts",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"content\":\"Shipping SkillSphere AI with JWT rotation, MongoDB aggregation, Socket.io, Stripe, and AI workflows.\",\"tags\":[\"mern\",\"saas\",\"portfolio\"]}"
+        }
+      }
+    },
+    {
+      "name": "Jobs - List",
+      "request": { "method": "GET", "url": "{{baseUrl}}/jobs?page=1&limit=10" }
+    },
+    {
+      "name": "Jobs - Create",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/jobs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"title\":\"Full Stack Developer\",\"description\":\"Build MERN SaaS features across React, Node, MongoDB, Socket.io, Stripe, and AI.\",\"company\":\"SkillSphere Labs\",\"location\":\"Remote\",\"isRemote\":true,\"jobType\":\"full-time\",\"skills\":[\"React\",\"Node.js\",\"MongoDB\",\"TypeScript\"]}"
+        }
+      }
+    },
+    {
+      "name": "AI - Generate Profile Summary",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/ai/profile-summary",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"headline\":\"Associate Software Engineer\",\"skills\":[\"React Native\",\"React.js\",\"Node.js\",\"MongoDB\"]}"
+        }
+      }
+    },
+    {
+      "name": "Payments - Create Checkout",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/payments/create-checkout",
+        "body": { "mode": "raw", "raw": "{\"plan\":\"premium\"}" }
+      }
+    },
+    {
+      "name": "Admin - Stats",
+      "request": { "method": "GET", "url": "{{baseUrl}}/admin/stats" }
+    }
+  ]
+}

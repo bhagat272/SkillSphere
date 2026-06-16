@@ -1,0 +1,24 @@
+{
+  "name": "skillsphere-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-powered Professional Networking & Freelance Collaboration Platform",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "npm run dev --workspace=apps/server",
+    "dev:client": "npm run dev --workspace=apps/client",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspace=apps/server",
+    "lint": "npm run lint --workspaces",
+    "docker:dev": "docker-compose -f docker-compose.yml up --build",
+    "docker:down": "docker-compose down -v"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

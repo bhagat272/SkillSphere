@@ -1,0 +1,39 @@
+# SkillSphere AI
+
+## Dependency & Environment Artifacts
+node_modules/
+.env
+.env.local
+.env.production
+
+## Build Outputs
+dist/
+build/
+.next/
+out/
+
+## Logs
+logs/
+*.log
+npm-debug.log*
+
+## IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Testing
+coverage/
+
+## Docker
+.docker/
+
+## TypeScript
+*.tsbuildinfo

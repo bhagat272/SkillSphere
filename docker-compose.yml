@@ -1,0 +1,94 @@
+version: '3.9'
+
+services:
+  # ─── MongoDB ───────────────────────────────────────────────────────────────
+  mongo:
+    image: mongo:7.0
+    container_name: skillsphere_mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_DATABASE: skillsphere
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - '27017:27017'
+    networks:
+      - skillsphere_net
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Redis ─────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7.2-alpine
+    container_name: skillsphere_redis
+    restart: unless-stopped
+    command: redis-server --requirepass redispassword --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - '6379:6379'
+    networks:
+      - skillsphere_net
+    healthcheck:
+      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Backend Server ────────────────────────────────────────────────────────
+  server:
+    build:
+      context: ./apps/server
+      dockerfile: Dockerfile.dev
+    container_name: skillsphere_server
+    restart: unless-stopped
+    env_file:
+      - ./apps/server/.env
+    environment:
+      - MONGODB_URI=mongodb://root:rootpassword@mongo:27017/skillsphere?authSource=admin
+      - REDIS_URL=redis://:redispassword@redis:6379
+      - NODE_ENV=development
+    volumes:
+      - ./apps/server:/app
+      - /app/node_modules
+    ports:
+      - '5000:5000'
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - skillsphere_net
+
+  # ─── Frontend Client ───────────────────────────────────────────────────────
+  client:
+    build:
+      context: ./apps/client
+      dockerfile: Dockerfile.dev
+    container_name: skillsphere_client
+    restart: unless-stopped
+    env_file:
+      - ./apps/client/.env
+    volumes:
+      - ./apps/client:/app
+      - /app/node_modules
+    ports:
+      - '3000:3000'
+    depends_on:
+      - server
+    networks:
+      - skillsphere_net
+
+volumes:
+  mongo_data:
+  redis_data:
+
+networks:
+  skillsphere_net:
+    driver: bridge

@@ -1,0 +1,174 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "SkillSphere AI API",
+    "version": "1.0.0",
+    "description": "Swagger-ready contract for core SkillSphere AI MERN SaaS APIs."
+  },
+  "servers": [
+    { "url": "http://localhost:5000/api/v1" }
+  ],
+  "security": [{ "bearerAuth": [] }],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "RegisterRequest": {
+        "type": "object",
+        "required": ["email", "password", "firstName", "lastName"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 8 },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "role": { "type": "string", "enum": ["user", "recruiter"] }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string" }
+        }
+      },
+      "PostRequest": {
+        "type": "object",
+        "required": ["content"],
+        "properties": {
+          "content": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "visibility": { "type": "string", "enum": ["public", "connections", "private"] }
+        }
+      },
+      "JobRequest": {
+        "type": "object",
+        "required": ["title", "description", "company", "location", "jobType", "skills"],
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "company": { "type": "string" },
+          "location": { "type": "string" },
+          "isRemote": { "type": "boolean" },
+          "jobType": { "type": "string", "enum": ["full-time", "part-time", "contract", "freelance", "internship"] },
+          "skills": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "security": [],
+        "summary": "Register a new user",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RegisterRequest" } } }
+        },
+        "responses": { "201": { "description": "Registered" } }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "security": [],
+        "summary": "Login and receive token pair",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LoginRequest" } } }
+        },
+        "responses": { "200": { "description": "Authenticated" } }
+      }
+    },
+    "/auth/refresh-token": {
+      "post": {
+        "security": [],
+        "summary": "Rotate refresh token and issue a new access token",
+        "responses": { "200": { "description": "Token rotated" } }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Get current user",
+        "responses": { "200": { "description": "Current user" } }
+      }
+    },
+    "/users/search": {
+      "get": {
+        "summary": "Search users by name, email, and skills",
+        "parameters": [{ "name": "q", "in": "query", "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Users" } }
+      }
+    },
+    "/posts": {
+      "get": {
+        "summary": "Get personalized feed",
+        "responses": { "200": { "description": "Paginated posts" } }
+      },
+      "post": {
+        "summary": "Create post",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PostRequest" } } }
+        },
+        "responses": { "201": { "description": "Post created" } }
+      }
+    },
+    "/posts/trending": {
+      "get": {
+        "security": [],
+        "summary": "Get trending posts",
+        "responses": { "200": { "description": "Trending posts" } }
+      }
+    },
+    "/jobs": {
+      "get": {
+        "summary": "List jobs",
+        "responses": { "200": { "description": "Paginated jobs" } }
+      },
+      "post": {
+        "summary": "Create job as recruiter/admin",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/JobRequest" } } }
+        },
+        "responses": { "201": { "description": "Job created" } }
+      }
+    },
+    "/jobs/{id}/apply": {
+      "post": {
+        "summary": "Apply to a job",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Application submitted" } }
+      }
+    },
+    "/chat/conversations": {
+      "get": {
+        "summary": "List conversations",
+        "responses": { "200": { "description": "Conversations" } }
+      }
+    },
+    "/ai/profile-summary": {
+      "post": {
+        "summary": "Generate AI profile summary",
+        "responses": { "200": { "description": "Generated summary" } }
+      }
+    },
+    "/payments/create-checkout": {
+      "post": {
+        "summary": "Create Stripe checkout session",
+        "responses": { "200": { "description": "Checkout URL" } }
+      }
+    },
+    "/admin/stats": {
+      "get": {
+        "summary": "Get platform statistics as admin",
+        "responses": { "200": { "description": "Platform stats" } }
+      }
+    }
+  }
+}
