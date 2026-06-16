@@ -5,6 +5,14 @@ import { asyncHandler } from '../../../shared/utils/asyncHandler';
 import { env } from '../../../config/env';
 import { verifyRefreshToken } from '../../../shared/utils/jwt';
 
+const refreshCookieOptions = {
+  httpOnly: true,
+  secure: env.isProduction,
+  sameSite: env.isProduction ? 'none' : 'strict',
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  path: '/api/v1/auth',
+} as const;
+
 // ─── Auth Controller ──────────────────────────────────────────────────────────
 // Controllers are deliberately thin — they only:
 //   1. Extract data from request
@@ -30,13 +38,7 @@ export class AuthController {
     const { user, accessToken, refreshToken } = await authService.login(req.body, deviceInfo);
 
     // Set refresh token in HttpOnly cookie (prevents XSS access)
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: env.isProduction,
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      path: '/api/v1/auth', // Only sent to auth routes
-    });
+    res.cookie('refreshToken', refreshToken, refreshCookieOptions);
 
     sendResponse.success(res, { user, accessToken }, 'Login successful');
   });
@@ -53,13 +55,7 @@ export class AuthController {
     const { accessToken, refreshToken: newRefreshToken } = await authService.refreshToken(token);
 
     // Rotate cookie
-    res.cookie('refreshToken', newRefreshToken, {
-      httpOnly: true,
-      secure: env.isProduction,
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/api/v1/auth',
-    });
+    res.cookie('refreshToken', newRefreshToken, refreshCookieOptions);
 
     sendResponse.success(res, { accessToken }, 'Token refreshed');
   });
